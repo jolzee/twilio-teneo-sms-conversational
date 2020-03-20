@@ -48,8 +48,11 @@ services:
     container_name: twilio-teneo-sms-conversational
     ports:
       - "3000:3000"
-    env_file:
-      - TIE_URL=https://<TIE-HOST>/<TIE-CTX-PATH>/
+    environment:
+      - TIE_URL=
+      - REDIS_HOST=
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
   ngrok:
     image: "wernight/ngrok:latest"
     container_name: ngrok
