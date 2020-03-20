@@ -8,10 +8,10 @@ before_script:
   - npm install
 script:
   # - npm test
-  - docker build -t teneo-khoros-webhook .
+  - docker build -t twilio-teneo-sms-conversational .
 after_success:
   - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-  - docker tag teneo-khoros-webhook $DOCKER_USER/teneo-khoros-webhook:$TRAVIS_BUILD_NUMBER
-  - docker push $DOCKER_USER/teneo-khoros-webhook:$TRAVIS_BUILD_NUMBER
-  - docker tag teneo-khoros-webhook $DOCKER_USER/teneo-khoros-webhook:latest
-  - docker push $DOCKER_USER/teneo-khoros-webhook:latest
+  - docker tag twilio-teneo-sms-conversational $DOCKER_USER/twilio-teneo-sms-conversational:$TRAVIS_BUILD_NUMBER
+  - docker push $DOCKER_USER/twilio-teneo-sms-conversational:$TRAVIS_BUILD_NUMBER
+  - docker tag twilio-teneo-sms-conversational $DOCKER_USER/twilio-teneo-sms-conversational:latest
+  - docker push $DOCKER_USER/twilio-teneo-sms-conversational:latest

@@ -2,7 +2,7 @@
   "name": "twilio-teneo-sms-conversational",
   "version": "1.0.0",
   "description": "A Twilio connector that allows Teneo to have conversations as a bot over SMS.",
-  "displayName": "Teneo Khoros Bot Connector",
+  "displayName": "Teneo Conversational SMS Connector for Twilio",
   "author": "Peter Joles <peter-joles@artificial-solutions.com> (https://www.linkedin.com/in/peterjoles/)",
   "main": "./dist-server/bin/www.js",
   "engines": {
@@ -29,7 +29,9 @@
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
+    "@jolzee/cache": "0.0.2",
     "body-parser": "^1.19.0",
+    "cachenator": "^1.0.0",
     "core-js": "^3.6.4",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
@@ -37,7 +39,8 @@
     "ioredis": "^4.16.0",
     "npm-run-all": "^4.1.5",
     "regenerator-runtime": "^0.13.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "twilio": "^3.41.1"
   },
   "devDependencies": {
     "@babel/node": "^7.8.7",

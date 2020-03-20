@@ -1,6 +1,6 @@
 FROM node:13.8.0-alpine3.11
 
-WORKDIR /opt/teneo-khoros-webhook
+WORKDIR /opt/twilio-teneo-sms-conversational
 COPY package*.json ./
 RUN npm install
 COPY . .

@@ -6,63 +6,42 @@
  */
 require("dotenv").config();
 const MessagingResponse = require("twilio").twiml.MessagingResponse;
-import Redis from "ioredis";
+import Cache from "@jolzee/cache";
 import TIE from "@artificialsolutions/tie-api-client";
 const uniqueKey = "twilio-teneo-sms-session";
 
-const redis = new Redis({
-  port: parseInt(process.env.REDIS_PORT), // Redis port
-  host: process.env.REDIS_HOST, // Redis host
-  family: 4, // 4 (IPv4) or 6 (IPv6)
-  password: process.env.REDIS_PASSWORD
-});
+let cache;
+
+if (process.env.REDIS_HOST) {
+  cache = new Cache({
+    redisHost: process.env.REDIS_HOST,
+    redisPort: process.env.REDIS_PORT,
+    redisPassword: process.env.REDIS_PASSWORD,
+    defaultTimeToLiveMin: 20
+  });
+  console.log("Using Redis for Cache");
+} else {
+  cache = new Cache({
+    defaultTimeToLiveMin: 20
+  });
+  console.log("Using In-memory Cache");
+}
 
 const logTeneoResponse = teneoResponse => {
   console.log("Teneo Response:", teneoResponse);
   return teneoResponse;
 };
 
-const session = {
-  deleteSessionId: uniqueSessionKey => {
-    redis.del(`${uniqueKey}_${uniqueSessionKey}`).then(() => {
-      console.log("REDIS:DEL[SESSION] Deleted cache for key: ${uniqueSessionKey}");
-    });
-  },
-  findSessionId: async uniqueSessionKey => {
-    return new Promise((resolve, reject) => {
-      redis
-        .get(`${uniqueKey}_${uniqueSessionKey}`)
-        .then(teneoSesisonId => {
-          console.log("REDIS:GET[SESSION] Teneo Session ID: ", teneoSesisonId);
-          resolve(teneoSesisonId);
-        })
-        .catch(err => {
-          console.log("REDIS:HGET[SESSION]", err);
-          resolve(null);
-        });
-    });
-  },
-  cacheSessionId: (uniqueSessionKey, teneoSessionId) => {
-    let minutes = 20;
-    redis.set(`${uniqueKey}_${uniqueSessionKey}`, teneoSessionId, "EX", minutes * 60);
-    console.log(
-      `REDIS:SET[SESSION] Caching Session Info for [${minutes}min]: `,
-      uniqueSessionKey,
-      teneoSessionId
-    );
-  }
-};
-
 const teneoProcess = async (fromNumber, smsText) => {
-  const teneoSessionId = await session.findSessionId(fromNumber);
+  const teneoSessionId = await cache.get(fromNumber);
   return new Promise((resolve, reject) => {
     TIE.sendInput(process.env.TIE_URL, teneoSessionId, {
       text: smsText,
-      channel: "twillio-sms"
+      channel: "twilio-sms"
     })
       .then(logTeneoResponse)
       .then(teneoResponse => {
-        session.cacheSessionId(fromNumber, teneoResponse.sessionId);
+        cache.set(fromNumber, teneoResponse.sessionId);
         let extraInfo = teneoResponse.output.parameters; // not using yet
         let responseText = teneoResponse.output.text;
         let responseObj = {
@@ -83,7 +62,7 @@ const teneoProcess = async (fromNumber, smsText) => {
 };
 
 export const handleInboundSms = (req, res) => {
-  console.log(req.body);
+  console.log("Inbound SMS:", req.body);
   const sms = req.body;
   const smsText = sms.Body;
   const fromNumber = sms.From;
