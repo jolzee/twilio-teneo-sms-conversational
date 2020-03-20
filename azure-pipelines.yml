@@ -1,0 +1,16 @@
+trigger:
+  - master
+
+pool:
+  vmImage: "ubuntu-latest"
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "12.13.1"
+    displayName: "Build Leopard Chat UI"
+
+  - script: |
+      npm ci
+      npm run build
+    displayName: "npm install and build"
