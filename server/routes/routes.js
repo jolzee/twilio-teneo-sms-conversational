@@ -32,13 +32,23 @@ const logTeneoResponse = teneoResponse => {
   return teneoResponse;
 };
 
-const teneoProcess = async (fromNumber, smsText) => {
+const teneoProcess = async sms => {
+  const smsText = sms.Body;
+  const fromNumber = sms.From;
   const teneoSessionId = await cache.get(fromNumber);
+
+  const data = {
+    text: smsText,
+    channel: "twilio-sms",
+    countryCode: sms.FromCountry, // ["GB" / "US"]
+    city: sms.FromCity,
+    regionCode: sms.FromState, // "CA"
+    zip: sms.FromZip,
+    fromNumber: fromNumber
+  };
+
   return new Promise((resolve, reject) => {
-    TIE.sendInput(process.env.TIE_URL, teneoSessionId, {
-      text: smsText,
-      channel: "twilio-sms"
-    })
+    TIE.sendInput(process.env.TIE_URL, teneoSessionId, data)
       .then(logTeneoResponse)
       .then(teneoResponse => {
         cache.set(fromNumber, teneoResponse.sessionId);
@@ -64,9 +74,7 @@ const teneoProcess = async (fromNumber, smsText) => {
 export const handleInboundSms = (req, res) => {
   console.log("Inbound SMS:", req.body);
   const sms = req.body;
-  const smsText = sms.Body;
-  const fromNumber = sms.From;
-  teneoProcess(fromNumber, smsText).then(teneoRes => {
+  teneoProcess(sms).then(teneoRes => {
     const twiml = new MessagingResponse();
     const message = twiml.message();
     message.body(teneoRes.text);
