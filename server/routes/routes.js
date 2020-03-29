@@ -12,13 +12,21 @@ const uniqueKey = "twilio-teneo-sms-session";
 
 let cache;
 
-if (process.env.REDIS_HOST) {
-  cache = new Cache({
-    redisHost: process.env.REDIS_HOST,
-    redisPort: process.env.REDIS_PORT,
-    redisPassword: process.env.REDIS_PASSWORD,
-    defaultTimeToLiveMin: 20
-  });
+if (process.env.REDIS_HOST || process.env.REDIS_URL) {
+  if (process.env.REDIS_URL) {
+    cache = new Cache({
+      redisUrl: process.env.REDIS_URL,
+      defaultTimeToLiveMin: 20
+    });
+  } else {
+    cache = new Cache({
+      redisHost: process.env.REDIS_HOST,
+      redisPort: process.env.REDIS_PORT,
+      redisPassword: process.env.REDIS_PASSWORD,
+      defaultTimeToLiveMin: 20
+    });
+  }
+
   console.log("Using Redis for Cache");
 } else {
   cache = new Cache({
