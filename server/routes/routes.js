@@ -14,11 +14,13 @@ let cache;
 
 if (process.env.REDIS_HOST || process.env.REDIS_URL) {
   if (process.env.REDIS_URL) {
+    console.log(process.env.REDIS_URL);
     cache = new Cache({
       redisUrl: process.env.REDIS_URL,
       defaultTimeToLiveMin: 20
     });
   } else {
+    console.log(process.env.REDIS_HOST);
     cache = new Cache({
       redisHost: process.env.REDIS_HOST,
       redisPort: process.env.REDIS_PORT,
