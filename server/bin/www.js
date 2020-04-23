@@ -15,6 +15,11 @@ app.use("/", router);
 const PORT = process.env.PORT || 5000;
 
 router.post("/", handleInboundSms);
+router.get("/ping", (req, res) => {
+  res.send({
+    status: "pong"
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
