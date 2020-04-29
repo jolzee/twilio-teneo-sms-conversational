@@ -25,6 +25,10 @@
     "TIE_URL": {
       "description": "TIE Url - For example: https://<my-tie-domain>/<tie-ctx>/",
       "required": true
+    },
+    "SHEET_ID": {
+      "description": "Your sheet ID",
+      "required": false
     }
   }
 }

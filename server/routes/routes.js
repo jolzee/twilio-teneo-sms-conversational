@@ -57,6 +57,10 @@ const teneoProcess = async sms => {
     fromNumber: fromNumber
   };
 
+  if (process.env.SHEET_ID) {
+    data.sheetId = process.env.SHEET_ID;
+  }
+
   return new Promise((resolve, reject) => {
     TIE.sendInput(process.env.TIE_URL, teneoSessionId, data)
       .then(logTeneoResponse)
